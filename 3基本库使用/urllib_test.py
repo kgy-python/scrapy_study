@@ -1,5 +1,6 @@
 #!/usr/bin/env python 
 # -*- coding:utf-8 -*-
+import socket
 
 __author__ = 'kgy'
 
@@ -20,8 +21,12 @@ print(response.getheader('Server'))
 
 print('*' * 30)
 import urllib.parse
+import urllib.error
 
-data = bytes(urllib.parse.urlencode({'word': 'hello'}), encoding='utf8')
-response = urllib.request.urlopen('http://httpbin.org/post', data=data)
-print(response.read().decode('utf-8'))
-
+try:
+    data = bytes(urllib.parse.urlencode({'word': 'hello'}), encoding='utf8')
+    response = urllib.request.urlopen('http://httpbin.org/post', data=data, timeout=1)
+    print(response.read().decode('utf-8'))
+except urllib.error.URLError as e:
+    if isinstance(e.reason, socket.timeout):
+        print('TIME OUT')
