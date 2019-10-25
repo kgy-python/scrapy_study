@@ -32,6 +32,7 @@ def get_page(page):
     except requests.ConnectionError as e:
         print('Error', e.args)
 
+
 def parse_page(json):
     if json:
         items = json.get('data').get('cards')
@@ -45,9 +46,23 @@ def parse_page(json):
             weibo['reposts'] = item.get('reposts_count')
             yield weibo
 
+
+from pymongo import MongoClient
+
+client = MongoClient()
+db = client['weibo']
+collection = db['weibo']
+
+
+def save_to_mongo(result):
+    if collection.insert(result):
+        print('Saved to Mongo')
+
+
 if __name__ == '__main__':
-    for page in range(1,11):
+    for page in range(1, 11):
         json = get_page(page)
         results = parse_page(json)
         for result in results:
             print(result)
+            save_to_mongo(result)
